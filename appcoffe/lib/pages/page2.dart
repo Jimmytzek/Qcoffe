@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'dart:async';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Pagetwo extends StatefulWidget {
+  PagetwoState createState() => PagetwoState();
+}
+
+class PagetwoState extends State<Pagetwo> {
+  String result = "resultado de la consulta?";
+//getQr(String idqr) async{
+  //var response = await http.get("http://192.168.43.185:8080/");
+  //var result = json.decode(response.body);
+  // setState(() {
+  // });
+//print(response.body);
+//}
+  Future _scanQR() async {
+    try {
+      String qrResult = await BarcodeScanner.scan();
+      setState(() {
+        result = qrResult;
+      });
+    } on PlatformException catch (ex) {
+      if (ex.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          result = "permiso de la camara denegado";
+        });
+      } else {
+        setState(() {
+          result = "error desconocido $ex";
+        });
+      }
+    } on FormatException {
+      setState(() {
+        result = "presiona el boton de regresar despues de escanear";
+      });
+    } catch (ex) {
+      setState(() {
+        result = "error desconocido 2 $ex";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // appBar: AppBar(
+      //   title: Text("Inventario "),
+      // ),
+      body: ListView.builder(
+        itemCount: result.length,
+        itemBuilder: (context, position) {
+          return Info("");
+        },
+      ) //Center(
+      //child: Text(" $result",
+      //style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold) ,
+      //),
+      //)
+      ,
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.camera_enhance),
+        label: Text("Scan"),
+        onPressed: _scanQR,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+    );
+  }
+}
+
+class Info extends StatelessWidget {
+  String result;
+  Info(this.result) {}
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Card(
+        child: Center(
+          child: Text("$result"),
+        ),
+      ),
+      onTap: () {
+        Text("esto es una prueba de posible card");
+        Card:
+        (Text("deberia ser un car despues del clic"));
+        {}
+      },
+    );
+  }
+}
